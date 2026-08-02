@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Inditalk.entitlements — the entitlements that belong in SOURCE control.
+
+  Wired via CODE_SIGN_ENTITLEMENTS in project.yml (not copied into the app bundle).
+
+  Only source-safe entitlements live here:
+    * aps-environment — Apple Push Notifications. Value is `development` for local /
+      TestFlight-debug builds. Xcode's automatic signing keeps this as-is; for an App
+      Store / production-push build you must flip this to `production` (Xcode does this
+      when you archive with a Distribution profile that has the Push capability, or set
+      it explicitly in a Release-only entitlements file).
+
+  Entitlements that are NOT in this file because they require Apple Developer portal
+  configuration and would break signing if added blindly — enable them in
+  "Signing & Capabilities" and add the matching key only when provisioned:
+    * keychain-access-groups — only needed if Inditalk shares its Keychain with an
+      extension (e.g. a Notification Service Extension that decrypts a push preview).
+    * com.apple.developer.usernotifications.time-sensitive — if you mark call/message
+      pushes time-sensitive.
+  VoIP (PushKit) and CallKit need NO extra entitlement key: they rely on the Push
+  Notifications capability (this aps-environment key) plus the `voip` UIBackgroundMode
+  already declared in Info.plist.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>aps-environment</key>
+    <string>development</string>
+</dict>
+</plist>

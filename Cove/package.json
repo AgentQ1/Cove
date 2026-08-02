@@ -1,0 +1,12 @@
+{
+  "name": "cove-tooling",
+  "description": "Repo-level tooling for Inditalk: Firestore security-rules tests. The iOS app itself has no npm dependencies; Cloud Functions live in functions/.",
+  "private": true,
+  "scripts": {
+    "test:rules": "firebase emulators:exec --only firestore --project cove-7f31f \"node --test tests/rules/*.test.js\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "firebase": "^12.0.0"
+  }
+}

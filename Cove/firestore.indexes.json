@@ -1,0 +1,23 @@
+{
+  "indexes": [
+    {
+      "//": "chats: whereField(participantIds, arrayContains) + order(lastActivity desc) — FirestoreService.listenChats",
+      "collectionGroup": "chats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participantIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "lastActivity", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "calls: whereField(to ==) + whereField(state ==) — FirestoreSignalingService.listenForIncoming",
+      "collectionGroup": "calls",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "to", "order": "ASCENDING" },
+        { "fieldPath": "state", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

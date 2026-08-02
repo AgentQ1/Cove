@@ -1,0 +1,44 @@
+# Xcode / SwiftPM
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+DerivedData/
+.derivedData/
+build/
+.build/
+*.xcworkspace/xcuserdata/
+
+# XcodeGen output (regenerate with `xcodegen generate`)
+Inditalk.xcodeproj/
+
+# macOS
+.DS_Store
+
+# Cloud Functions
+functions/node_modules/
+# Non-secret function config (TURN URLs, APNs key/team ids). Real secrets live in
+# Secret Manager, never on disk — see functions/.env.sample.
+functions/.env
+
+# Repo-level tooling (Firestore rules tests) + emulator artifacts
+node_modules/
+firestore-debug.log
+firebase-debug.log
+ui-debug.log
+.firebase/
+
+# Secrets / signing
+*.mobileprovision
+*.p12
+*.certSigningRequest
+*.p8
+AuthKey_*.p8
+GoogleService-Info.plist
+Inditalk.entitlements.local
+
+# Local signing-team override sourced before `xcodegen generate` (keeps DEVELOPMENT_TEAM
+# out of source). See project.yml and .xcodegen.env.sample.
+.xcodegen.env
+
+# Release-config build output (companion to .derivedData/)
+.derivedData-release/

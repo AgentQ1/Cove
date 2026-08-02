@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GoogleService-Info.SAMPLE.plist  —  TEMPLATE, NOT the real config.
+
+  Your project's known values are filled in below (PROJECT_ID, GCM_SENDER_ID).
+  The three ⟨REPLACE_…⟩ values are secrets that only exist AFTER you register the
+  iOS app (bundle id `chat.cove.app`) in the Firebase console.
+
+  Steps:
+    1. Firebase console → Project "cove" (cove-7f31f) → Add app → iOS.
+       Bundle ID: chat.cove.app  (matches project.yml)
+    2. Download the generated **GoogleService-Info.plist**.
+    3. Drop that file into Inditalk/Resources/ and add it to the app target.
+    4. Delete this .SAMPLE file. Never commit the real plist with production keys
+       to a public repo.
+
+  This file will NOT let the app connect on its own — the API_KEY and GOOGLE_APP_ID
+  are required and are unique to your registered app.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PROJECT_ID</key>
+    <string>cove-7f31f</string>
+    <key>GCM_SENDER_ID</key>
+    <string>493828629214</string>
+    <key>STORAGE_BUCKET</key>
+    <string>cove-7f31f.appspot.com</string>
+    <key>DATABASE_URL</key>
+    <string>https://cove-7f31f.firebaseio.com</string>
+    <key>BUNDLE_ID</key>
+    <string>chat.cove.app</string>
+
+    <!-- ⟨REPLACE from the downloaded plist⟩ -->
+    <key>API_KEY</key>
+    <string>REPLACE_WITH_REAL_IOS_API_KEY</string>
+    <key>GOOGLE_APP_ID</key>
+    <string>REPLACE_WITH_REAL_GOOGLE_APP_ID</string>
+    <key>CLIENT_ID</key>
+    <string>REPLACE_WITH_REAL_CLIENT_ID.apps.googleusercontent.com</string>
+
+    <key>IS_ADS_ENABLED</key>
+    <false/>
+    <key>IS_ANALYTICS_ENABLED</key>
+    <false/>
+    <key>IS_APPINVITE_ENABLED</key>
+    <true/>
+    <key>IS_GCM_ENABLED</key>
+    <true/>
+    <key>IS_SIGNIN_ENABLED</key>
+    <true/>
+    <key>PLIST_VERSION</key>
+    <string>1</string>
+</dict>
+</plist>

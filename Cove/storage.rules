@@ -1,0 +1,55 @@
+rules_version = '2';
+// Firebase Storage rules for Inditalk.
+//
+// Storage rules CANNOT query Firestore, so per-chat participant authorization can't be
+// enforced here directly. Inditalk's mitigations, safest-feasible without a proxy:
+//   1. Attachments are E2EE ciphertext (encrypted on-device before upload) — the server
+//      holds only opaque blobs even if a signed-in non-participant reads one.
+//   2. Writes are ATTRIBUTABLE: the uploader's uid is in the path and enforced, so a
+//      user can only write under their own folder (no spoofing another user's uploads).
+//   3. Size caps bound abuse.
+//
+// For true per-chat READ authorization you need one of (documented as a backend item in
+// APP_STORE_DEPLOYMENT_REPORT.md): a Cloud Function download proxy that checks Firestore
+// membership, or custom auth claims listing the caller's chatIds (minted by a Function).
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() { return request.auth != null; }
+
+    // Profile photos: the owner writes; any signed-in user may read.
+    match /avatars/{uid}/{file=**} {
+      allow read: if signedIn();
+      allow write: if signedIn()
+                   && request.auth.uid == uid
+                   && request.resource.size < 8 * 1024 * 1024;
+    }
+
+    // Chat attachments (encrypted blobs). Path carries the uploader's uid so writes are
+    // attributable and can only be made under one's own folder; size-capped.
+    match /chats/{chatId}/{uid}/{file=**} {
+      allow read: if signedIn();
+      allow write: if signedIn()
+                   && request.auth.uid == uid
+                   && request.resource.size < 100 * 1024 * 1024;
+    }
+
+    // Status photos/videos: broadcast to contacts like avatars (owner writes, any
+    // signed-in user reads). The doc under users/{uid}/statuses points here.
+    // Delete is granted separately: on delete request.resource is null, so a size
+    // check there would deny the owner cleaning up their own expired media.
+    match /status/{uid}/{file=**} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+                            && request.auth.uid == uid
+                            && request.resource.size < 100 * 1024 * 1024;
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

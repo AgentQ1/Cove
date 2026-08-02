@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Inditalk.Release.entitlements — entitlements for RELEASE builds (TestFlight + App Store).
+
+  Identical to Inditalk.entitlements except `aps-environment` is `production`.
+
+  Why two files: APNs is environment-split. A token minted against the sandbox gateway
+  is rejected by the production gateway and vice versa, so a build signed with
+  `development` silently receives no pushes once it ships through TestFlight or the App
+  Store. Relying on Xcode to rewrite this during archive is fragile — it only happens
+  with a Distribution profile that carries the Push capability, and a mismatch fails
+  silently at runtime rather than at build time. Pinning it per configuration
+  (CODE_SIGN_ENTITLEMENTS in project.yml) makes the behavior explicit and reproducible
+  from the command line.
+
+  PAIRED CONSOLE STEP: the same APNs .p8 auth key must be present in Firebase's
+  PRODUCTION APNs slot (Project settings → Cloud Messaging → Apple app configuration).
+  An auth key is environment-agnostic, so it is the SAME file you uploaded to the
+  development slot — but Firebase keys its lookup by slot, so it must be uploaded to
+  both. Without it, FCM cannot reach production APNs and pushes to release builds fail.
+
+  Everything else follows Inditalk.entitlements: VoIP (PushKit) and CallKit need no extra
+  entitlement key — they rely on the Push Notifications capability (this
+  `aps-environment` key) plus the `voip` UIBackgroundMode declared in Info.plist.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>aps-environment</key>
+    <string>production</string>
+</dict>
+</plist>

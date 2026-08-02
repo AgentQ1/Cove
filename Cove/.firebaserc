@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "cove-7f31f"
+  },
+  "targets": {
+    "cove-7f31f": {
+      "hosting": {
+        "inditalk": [
+          "inditalk"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

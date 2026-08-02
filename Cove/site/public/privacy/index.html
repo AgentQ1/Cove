@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy · Inditalk</title>
+<meta name="description" content="What Inditalk collects, why, and how to delete your data.">
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#F5F2EC; --surface:#FBF9F5; --ink:#1C3A4B; --text:#20262B; --muted:#5F6B72;
+  --line:#E2DCD1; --accent:#2F6E63;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#14171A; --surface:#1C2024; --ink:#CFE3ED; --text:#E8EAEC; --muted:#9AA4AB;
+        --line:#2C3238; --accent:#6FB3A6;}
+}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 72px}
+header.site{display:flex;align-items:center;gap:12px;padding:20px 0;border-bottom:1px solid var(--line);
+  margin-bottom:36px;flex-wrap:wrap}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--ink);color:var(--bg);
+  display:grid;place-items:center;font-weight:700;font-size:19px;flex:none}
+.brand{font-weight:700;font-size:19px;color:var(--text);text-decoration:none}
+nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+nav a{color:var(--muted);text-decoration:none;font-size:14px}
+nav a:hover{color:var(--accent)}
+h1{font-size:32px;line-height:1.2;margin:0 0 6px}
+h2{font-size:20px;margin:34px 0 10px;color:var(--ink)}
+h3{font-size:16px;margin:22px 0 6px}
+.updated{color:var(--muted);font-size:14px;margin:0 0 28px}
+p,li{color:var(--text)}
+a{color:var(--accent)}
+ul{padding-left:22px}
+li{margin:6px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:var(--surface);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:18px 0}
+.lead{font-size:18px;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:22px;color:var(--muted);font-size:14px}
+footer a{color:var(--muted)}
+code{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+  <div class="logo">I</div>
+  <a class="brand" href="/">Inditalk</a>
+  <nav><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/guidelines">Guidelines</a><a href="/help">Help</a></nav>
+</header>
+
+<h1>Privacy Policy</h1>
+<p class="updated">Last updated 27 July 2026</p>
+
+<p>Inditalk is operated by <strong>MOOMOLAB LLC</strong>, 3361 South Wabash Avenue, Chicago, IL 60616, United States, which is the controller
+responsible for the personal data described here. This policy explains what Inditalk
+(“we”, “the app”) collects when you use the Inditalk iOS app, why we collect it, and the
+choices you have. Questions: <a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a>.</p>
+
+<h2>1. What we collect</h2>
+<table>
+<tr><th>Data</th><th>Why</th></tr>
+<tr><td>Phone number</td><td>It is your account identifier. Sign-in is by SMS one-time code; we do not use passwords.</td></tr>
+<tr><td>Account ID</td><td>An identifier assigned to your account, used to route messages and calls.</td></tr>
+<tr><td>Profile: display name, About text, profile photo</td><td>Shown to people you chat with. All optional except the display name.</td></tr>
+<tr><td>Contacts</td><td>Only if you grant contacts access. Phone numbers are hashed on your device before being sent, so we can tell you which of your contacts already use Inditalk without receiving your address book in readable form.</td></tr>
+<tr><td>Messages and attachments</td><td>Stored so they can be delivered to the people you send them to. See “Encryption” below.</td></tr>
+<tr><td>Status updates</td><td>Text, photos and videos you post as updates. These expire after 24 hours.</td></tr>
+<tr><td>Call records</td><td>Who called whom, when, for how long, and whether it was voice or video. We do not record call audio or video.</td></tr>
+<tr><td>Push notification token</td><td>So your device can be told a message or call has arrived.</td></tr>
+<tr><td>Location</td><td>Only the location you explicitly choose to send in a chat. We do not track your location in the background.</td></tr>
+</table>
+
+<h2>2. What we do not do</h2>
+<ul>
+  <li>We do not show advertising.</li>
+  <li>We do not use advertising identifiers (IDFA) and do not ask for tracking permission.</li>
+  <li>We do not include analytics or advertising SDKs.</li>
+  <li>We do not sell or rent your personal data.</li>
+  <li>We do not use your messages to build advertising or marketing profiles.</li>
+</ul>
+
+<h2>3. Encryption — what is and is not protected</h2>
+<p>We want to be precise here rather than make a broad claim.</p>
+<ul>
+  <li><strong>One-to-one message bodies and attachments are encrypted on your device</strong>
+      before they are stored, so our servers hold ciphertext rather than readable text.</li>
+  <li><strong>This is not an audited end-to-end encryption system.</strong> Key management
+      is still being hardened and has not been independently reviewed. Please do not rely
+      on Inditalk for information whose disclosure would put you at serious risk.</li>
+  <li><strong>Status updates are not encrypted this way.</strong> They are broadcast to your
+      contacts, and their media is stored unencrypted.</li>
+  <li><strong>Group chat bodies are not covered by the one-to-one encryption described above.</strong></li>
+  <li><strong>Metadata is visible to the service</strong> — who is messaging or calling whom,
+      and when — even where message bodies are encrypted.</li>
+  <li>Calls use WebRTC and are encrypted in transit (SRTP/DTLS). When a direct connection
+      cannot be made, media is relayed through a TURN server.</li>
+</ul>
+
+<h2>4. Service providers</h2>
+<p>Inditalk runs on <strong>Google Firebase</strong> (Google LLC). Firebase provides phone
+authentication, the database, file storage, push delivery and server functions, and
+processes the data above on our behalf. See
+<a href="https://firebase.google.com/support/privacy">Firebase&nbsp;privacy</a>. We also
+operate a TURN relay server that carries call media when a direct peer-to-peer connection
+is not possible; it relays encrypted media and does not store it.</p>
+
+<h2>5. Retention</h2>
+<ul>
+  <li>Messages and attachments are retained until deleted by you, or until they expire if
+      you turned on disappearing messages.</li>
+  <li>Status updates are deleted automatically 24 hours after posting.</li>
+  <li>Your profile and account data are retained while your account exists.</li>
+  <li>Deleting your account removes your profile, keys, chat membership and stored files —
+      see below.</li>
+</ul>
+
+<h2>6. Deleting your account and data</h2>
+<p>You can delete your account from inside the app at any time:
+<strong>Settings → Account → Delete Account</strong>. This deletes your account, removes
+your profile, encryption keys, chat membership and uploaded files from our servers, and
+wipes all Inditalk data stored on your device. It cannot be undone. Full steps are on the
+<a href="/delete-account">account deletion page</a>. If you cannot access the app, email
+<a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a> from the phone number on the account.</p>
+<p>Note that messages you already sent to other people remain on their devices, in the same
+way that a sent SMS does.</p>
+
+<h2>7. Your rights</h2>
+<p>You can access and correct your profile in the app, delete your account and data as
+described above, withdraw contacts, camera, microphone, photos, location or notification
+permissions at any time in iOS Settings, and contact us at
+<a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a> to ask what we hold about you. Depending on where
+you live, you may have additional rights under laws such as the GDPR or India's DPDP Act;
+write to us and we will honour them.</p>
+
+<h2>8. Children</h2>
+<p>Inditalk is not intended for children under 13, and you must be old enough to consent to
+this policy where you live. We do not knowingly collect data from children under 13. If you
+believe a child has created an account, contact <a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a> and
+we will remove it.</p>
+
+<h2>9. International transfers</h2>
+<p>Our service providers operate globally, so your data may be processed in countries other
+than your own, including the United States.</p>
+
+<h2>10. Changes</h2>
+<p>If we change this policy we will update the date at the top of this page, and we will
+tell you in the app if the change is significant.</p>
+
+<h2>11. Contact</h2>
+<p>Privacy questions, data requests and complaints: <a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a>.</p>
+
+<footer>
+  <p>Inditalk is operated by MOOMOLAB LLC, 3361 South Wabash Avenue, Chicago, IL 60616, United States.<br>
+     Support: <a href="mailto:moomolab@gmail.com">moomolab@gmail.com</a></p>
+  <p><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> ·
+     <a href="/guidelines">Community Guidelines</a> · <a href="/help">Help &amp; Support</a> ·
+     <a href="/delete-account">Delete your account</a></p>
+</footer>
+</div>
+</body>
+</html>

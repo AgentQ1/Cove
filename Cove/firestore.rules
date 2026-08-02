@@ -1,0 +1,191 @@
+rules_version = '2';
+// Firestore security rules for Inditalk.
+//
+// Enforced server-side (client code cannot bypass these). Deploy with (always pin
+// the project — a home-dir active-project override can otherwise target the wrong one):
+//   firebase deploy --project cove-7f31f --only firestore:rules
+//
+// Model: a user may only touch chats they are a participant of; message writes must
+// be authored by the writer; profile/receipt/typing docs are owned by their uid.
+// Bodies are ciphertext, but these rules still restrict metadata access.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    // Only valid where `chatId` is already bound by the request path — i.e. for
+    // SUBCOLLECTIONS of a specific chat (messages, receipts, typing), where the parent
+    // document genuinely has to be fetched to authorize. Do NOT use it on
+    // /chats/{chatId} itself: a get() there cannot be evaluated for collection queries
+    // and silently denies every chat-list read. Use `resource.data` for that instead.
+    function isParticipant(chatId) {
+      return signedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds;
+    }
+
+    // Profiles: anyone signed in can read (for contact discovery / display);
+    // only the owner can write their own.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if isSelf(uid);
+
+      // Public prekey bundle for E2EE. Rules do NOT cascade to subcollections, so this
+      // must be declared explicitly (peers read your PUBLIC keys; only you publish).
+      match /keys/{keyId} {
+        allow read: if signedIn();
+        allow write: if isSelf(uid);
+      }
+
+      // Your block list — private to you. Written by the client (DataStore.blockSink ->
+      // FirestoreService.setBlocked) and read SERVER-SIDE by the onCallInvite function,
+      // which is the only thing that stops a blocked contact ringing a locked phone: the
+      // in-app check needs a running sync coordinator, and a push-launched app has none.
+      match /blocked/{blockedUid} {
+        allow read, write: if isSelf(uid);
+      }
+
+      // Push tokens, one document per install (PushService.deviceId):
+      //   { voipToken?, fcmToken?, apnsEnvironment, platform, bundleId, updatedAt }
+      //
+      // OWNER-ONLY, and that is the whole point of the subcollection. These used to be
+      // fields on users/{uid}, which every signed-in user can read — a push token is not
+      // a credential (sending needs Inditalk's APNs key) but it IS a stable per-install
+      // identifier, so any account could enumerate another user's devices. Rules do not
+      // cascade, so this block is what protects them. Cloud Functions read these with the
+      // Admin SDK, which bypasses rules entirely.
+      match /privateDevices/{deviceId} {
+        allow read, write: if isSelf(uid);
+      }
+
+      // 24h status updates ("Updates" tab). Statuses are broadcast to contacts, the
+      // same visibility model as the profile photo/about above: any signed-in user may
+      // read, only the owner writes. Clients only ever LISTEN to the statuses of
+      // people they share a chat with (FirebaseSyncCoordinator.subscribeStatuses).
+      match /statuses/{statusId} {
+        allow read: if signedIn();
+        allow write: if isSelf(uid);
+
+        // "Seen by" receipts, one doc per viewer (docId == viewer uid). Rules do NOT
+        // cascade, so this needs its own block.
+        //
+        // Only the status OWNER may read the list — a viewer must not be able to see
+        // who else watched. A viewer may write only their own doc, and cannot delete it
+        // (no un-seeing); the owner deletes them when removing the status.
+        match /views/{viewerId} {
+          allow read: if isSelf(uid);
+          allow create, update: if isSelf(viewerId);
+          allow delete: if isSelf(uid);
+        }
+      }
+    }
+
+    // Chats: only participants can read; creation requires the creator to be a
+    // participant; updates limited to participants.
+    //
+    // These use `resource.data` rather than the `isParticipant()` helper on purpose.
+    // isParticipant() does a get() of the chat document, and a get() cannot be evaluated
+    // for LIST/query operations — the document id is not yet bound when Firestore
+    // authorizes a collection query. Using it here denied `listenChats()`
+    // (whereField participantIds arrayContains uid) for every participant, so each user's
+    // chat list came back empty and messages appeared to never arrive.
+    //
+    // `resource.data` refers to the document actually being read or returned, which works
+    // for single gets AND queries, and costs no extra read.
+    match /chats/{chatId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participantIds;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.participantIds;
+      // Both the existing and the incoming document must keep the writer as a
+      // participant, so nobody can update a chat they are not in, or remove themselves
+      // and keep writing.
+      allow update: if signedIn()
+                    && request.auth.uid in resource.data.participantIds
+                    && request.auth.uid in request.resource.data.participantIds;
+      allow delete: if false;
+
+      // Messages: participants read; a message must be authored by the writer.
+      match /messages/{messageId} {
+        allow read: if isParticipant(chatId);
+        allow create: if isParticipant(chatId) &&
+                         request.resource.data.senderId == request.auth.uid;
+        allow update, delete: if signedIn() &&
+                         resource.data.senderId == request.auth.uid;
+      }
+
+      // Receipts & typing: each user owns only their own doc (docId == uid).
+      match /receipts/{uid} {
+        allow read: if isParticipant(chatId);
+        allow write: if isSelf(uid);
+      }
+      match /typing/{uid} {
+        allow read: if isParticipant(chatId);
+        allow write: if isSelf(uid);
+      }
+
+      // Reactions: one document per (message, user), doc id "{messageId}_{uid}".
+      //
+      // Ownership is authorized on the `uid` FIELD, not the doc id: the id is a
+      // composite, so `isSelf(reactionId)` cannot express it, and trusting the id alone
+      // would let anyone craft "someoneElsesMessage_victimUid". Every participant reads
+      // the whole subcollection (that is the live cross-device sync); each participant
+      // writes and deletes only rows carrying their own uid. The emoji itself is
+      // ciphertext — the server never learns which reaction was used.
+      //
+      // The id is ALSO required to equal "{messageId}_{uid}". Without that a client
+      // could write several documents that all carry its own uid and the same messageId
+      // (different ids), and "one reaction per user per message" — which this design
+      // enforces through the id rather than a query — would silently stop holding.
+      // `hasOnly` keeps unknown fields out of a document every participant can read.
+      match /reactions/{reactionId} {
+        function wellFormedReaction() {
+          return request.resource.data.uid == request.auth.uid
+                 && reactionId == request.resource.data.messageId + "_" + request.auth.uid
+                 && request.resource.data.ciphertext is string
+                 && request.resource.data.keys().hasOnly(
+                      ["messageId", "uid", "ciphertext", "updatedAt"]);
+        }
+        allow read: if isParticipant(chatId);
+        allow create, update: if isParticipant(chatId) && wellFormedReaction();
+        allow delete: if isParticipant(chatId) && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // Calls: only the two parties (from/to) can read/write the call + its signals.
+    match /calls/{callId} {
+      function isCallParty() {
+        return signedIn() && (
+          request.auth.uid == resource.data.from || request.auth.uid == resource.data.to ||
+          request.auth.uid == request.resource.data.from || request.auth.uid == request.resource.data.to);
+      }
+      allow read, create, update: if isCallParty();
+      allow delete: if false;
+
+      match /signals/{signalId} {
+        // Signals leak SDP/ICE metadata, so restrict reads to the two call parties
+        // (not any signed-in user). Requires a get() on the parent call doc.
+        function parentCall() {
+          return get(/databases/$(database)/documents/calls/$(callId)).data;
+        }
+        function isSignalParty() {
+          return signedIn() &&
+            (request.auth.uid == parentCall().from || request.auth.uid == parentCall().to);
+        }
+        allow read: if isSignalParty();
+        allow create: if isSignalParty() && request.resource.data.from == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    // Abuse reports: a signed-in user may create a report authored by themselves.
+    // Reports are readable/actionable only by moderators via the Admin SDK / Cloud
+    // Functions (which bypass these rules) — never by clients.
+    match /reports/{reportId} {
+      allow create: if signedIn() && request.resource.data.reporterUid == request.auth.uid;
+      allow read, update, delete: if false;
+    }
+  }
+}

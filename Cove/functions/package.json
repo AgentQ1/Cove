@@ -1,0 +1,16 @@
+{
+  "name": "cove-functions",
+  "description": "Cloud Functions for Inditalk (push notifications, VoIP call pushes, TURN credentials)",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^5.1.0"
+  }
+}

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Info.plist for Inditalk.
+
+  Contains the usage-description strings iOS requires before prompting for camera,
+  microphone, photo-library, and contacts access, plus the background modes needed
+  for VoIP calls and background message delivery. Permission requests are made
+  just-in-time from PermissionsManager.
+
+  NOTE: project.yml references this file via INFOPLIST_FILE (it does NOT use the
+  XcodeGen `info:` key, which would overwrite this file on every generate).
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundleDisplayName</key>
+    <string>Inditalk</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(MARKETING_VERSION)</string>
+    <key>CFBundleVersion</key>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>UILaunchScreen</key>
+    <dict/>
+
+    <!-- Export compliance.
+         The app implements encryption beyond what the OS provides: message bodies are
+         sealed by Services/Crypto (X25519 key agreement, ChaCha20-Poly1305, HKDF-SHA256)
+         before they reach Firestore, rather than relying on HTTPS alone. All algorithms
+         are standard and published — none proprietary — so the App Store Connect answer
+         is "standard algorithms in addition to Apple's OS encryption": non-exempt, and
+         it requires export documentation on file.
+
+         ITSAppUsesNonExemptEncryption is deliberately NOT set here. Setting it to YES
+         without a matching ITSEncryptionExportComplianceCode makes every upload fail
+         validation with error 90592 ("Invalid Export Compliance Code … [] doesn't match
+         the app's export compliance documentation"), which blocks TestFlight too. Until
+         the BIS/NSA self-classification (ECCN 5D992.c) is filed and Apple returns a code,
+         answer the export-compliance question per-version in App Store Connect instead.
+         When the code arrives, add BOTH keys here together. -->
+
+    <!-- Just-in-time permission prompts -->
+    <key>NSCameraUsageDescription</key>
+    <string>Inditalk uses the camera so you can take photos and videos to share, and make video calls.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Inditalk uses the microphone for voice messages and voice/video calls.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Inditalk needs access to your photos so you can share images and videos in chats.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Inditalk saves photos and videos you receive to your library when you choose to.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Inditalk uses your contacts to help you find friends who are already on Inditalk. Phone numbers are hashed before they leave your device.</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>Inditalk can use Face ID to lock the app and protect your chats.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Inditalk uses your location only when you choose to share it in a chat.</string>
+
+    <!--
+      Firebase phone-auth callback URL scheme. REQUIRED — not optional.
+
+      FirebaseAuth's `PhoneAuthProvider.verifyPhoneNumber` opens with an unconditional
+      guard that the callback scheme is registered here, and `fatalError`s if it isn't.
+      That check runs before any test-number or silent-push logic, so phone auth crashes
+      without this entry on device AND Simulator, regardless of APNs.
+
+      The scheme is NOT the REVERSED_CLIENT_ID. When the project has no OAuth client,
+      PhoneAuthProvider.init falls back to "app-" plus the GOOGLE_APP_ID with its colons
+      replaced by dashes (see PhoneAuthProvider.swift, init(auth:)). For cove-7f31f:
+
+        GOOGLE_APP_ID   1:493828629214:ios:387c9f9f33e94f3160184f
+        scheme          app-1-493828629214-ios-387c9f9f33e94f3160184f
+
+      So no OAuth client is needed. If one is ever added, GoogleService-Info.plist gains a
+      CLIENT_ID and the SDK prefers the reversed-client-ID scheme — add that as a second
+      entry then, and keep this one so existing installs keep working.
+
+      MUST be updated if the Firebase iOS app is ever re-registered (a new GOOGLE_APP_ID
+      changes this string).
+    -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>firebase-phone-auth</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>app-1-493828629214-ios-387c9f9f33e94f3160184f</string>
+            </array>
+        </dict>
+    </array>
+
+    <!-- Background execution for calls and message delivery -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>voip</string>
+        <string>audio</string>
+        <string>remote-notification</string>
+    </array>
+
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+    </dict>
+</dict>
+</plist>
